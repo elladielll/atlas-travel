@@ -5,7 +5,10 @@ class NominatimService:
 
     URL = "https://nominatim.openstreetmap.org/search"
 
-    async def find_city(self, city: str) -> int:
+    async def find_city(
+        self,
+        city: str,
+    ) -> dict:
 
         async with httpx.AsyncClient(timeout=60) as client:
 
@@ -14,6 +17,7 @@ class NominatimService:
                 params={
                     "q": city,
                     "format": "jsonv2",
+                    "addressdetails": 1,
                     "limit": 1,
                     "polygon_geojson": 0,
                 },
@@ -29,16 +33,35 @@ class NominatimService:
         if not result:
             raise Exception(f"City '{city}' not found")
 
-        osm_type = result[0]["osm_type"]
-        osm_id = int(result[0]["osm_id"])
+        item = result[0]
+
+        osm_type = item["osm_type"]
+        osm_id = int(item["osm_id"])
 
         if osm_type == "relation":
-            return 3600000000 + osm_id
+            area_id = 3600000000 + osm_id
+        elif osm_type == "way":
+            area_id = 2400000000 + osm_id
+        elif osm_type == "node":
+            area_id = 3600000000 + osm_id
+        else:
+            raise Exception("Unsupported OSM type")
 
-        if osm_type == "way":
-            return 2400000000 + osm_id
+        address = item.get("address", {})
 
-        if osm_type == "node":
-            return 3600000000 + osm_id
-
-        raise Exception("Unsupported OSM type")
+        return {
+            "area_id": area_id,
+            "city": (
+                address.get("city")
+                or address.get("town")
+                or address.get("village")
+                or city
+            ),
+            "country": address.get("country", ""),
+            "country_code": (
+                address.get("country_code", "").upper()
+            ),
+            "latitude": float(item["lat"]),
+            "longitude": float(item["lon"]),
+            "display_name": item.get("display_name", ""),
+        }

@@ -17,7 +17,9 @@ class OverpassService:
         city: str,
     ) -> list[ImportedPlace]:
 
-        area = await self.nominatim.find_city(city)
+        city_info = await self.nominatim.find_city(city)
+
+        area = city_info["area_id"]
 
         query = f"""
 [out:json][timeout:180];
@@ -128,10 +130,10 @@ out center tags;
             )
 
             imported_city = ImportedCity(
-                name=city,
-                country="UNKNOWN",
-                latitude=lat,
-                longitude=lon,
+                name=city_info["city"],
+                country=city_info["country_code"],
+                latitude=city_info["latitude"],
+                longitude=city_info["longitude"],
             )
 
             place = ImportedPlace(

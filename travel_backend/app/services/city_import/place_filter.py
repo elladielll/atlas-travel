@@ -4,53 +4,43 @@ from .models import ImportedPlace
 class PlaceFilter:
 
     ALLOWED_CATEGORIES = {
-    "museum",
-    "gallery",
-    "attraction",
-    "viewpoint",
-    "theme_park",
-    "zoo",
-    "aquarium",
-    "park",
-    "botanical_garden",
-    "castle",
-    "church",
-    "cathedral",
-    "memorial",
-    "monument",
-    "artwork",
-    "beach",
-    "restaurant",
-    "cafe",
-    "bar",
-    "pub",
-}
+        "museum",
+        "gallery",
+        "attraction",
+        "viewpoint",
+        "theme_park",
+        "zoo",
+        "aquarium",
+        "park",
+        "botanical_garden",
+        "castle",
+        "church",
+        "cathedral",
+        "memorial",
+        "monument",
+        "artwork",
+        "beach",
+        "restaurant",
+        "cafe",
+        "bar",
+        "pub",
+    }
 
     CATEGORY_MAPPING = {
-    "coffee_shop": "cafe",
-    "fast_food": "restaurant",
-    "biergarten": "bar",
-
-    "fountain": "attraction",
-
-    "theatre": "attraction",
-
-    "cinema": "attraction",
-
-    "arts_centre": "gallery",
-
-    "library": "attraction",
-
-    "memorial": "monument",
-
-    "monument": "monument",
-
-    "castle": "castle",
-
-    "viewpoint": "viewpoint",
-
-    "artwork": "artwork",
-}
+        "coffee_shop": "cafe",
+        "fast_food": "restaurant",
+        "biergarten": "bar",
+        "fountain": "attraction",
+        "theatre": "attraction",
+        "cinema": "attraction",
+        "arts_centre": "gallery",
+        "library": "attraction",
+        "memorial": "monument",
+        "monument": "monument",
+        "castle": "castle",
+        "viewpoint": "viewpoint",
+        "artwork": "artwork",
+    }
 
     @classmethod
     def filter(
@@ -72,8 +62,18 @@ class PlaceFilter:
 
             place.category = category
 
+            translation = (
+                place.translations.get("en")
+                or next(iter(place.translations.values()), {})
+            )
+
+            name = translation.get("name", "").strip()
+
+            if not name:
+                continue
+
             key = (
-                place.name.lower().strip(),
+                name.lower(),
                 round(place.latitude, 5),
                 round(place.longitude, 5),
             )
@@ -84,6 +84,9 @@ class PlaceFilter:
             unique.values(),
             key=lambda p: (
                 p.category,
-                p.name,
+                (
+                    p.translations.get("en")
+                    or next(iter(p.translations.values()), {})
+                ).get("name", ""),
             ),
         )

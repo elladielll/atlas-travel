@@ -19,33 +19,40 @@ async def enrich_place(
 
     async with semaphore:
 
-        if place.wikidata:
+        try:
 
-            try:
+            if place.wikidata:
 
                 data = await wikidata.load(place.wikidata)
 
                 if data:
                     place.image_url = await commons.image(data)
 
-                if place.wikipedia:
+            if place.wikipedia:
 
-                    title = place.wikipedia.split(":")[-1]
+                title = place.wikipedia.split(":")[-1]
 
-                    page = await wikipedia.summary(title)
+                page = await wikipedia.summary(title)
 
-                    if page:
+                if page:
 
-                        place.description = page.get("extract")
+                    translation = place.translations.setdefault(
+                        "en",
+                        {},
+                    )
 
-                        place.wikipedia_url = (
-                            page.get("content_urls", {})
-                            .get("desktop", {})
-                            .get("page")
-                        )
+                    translation["description"] = (
+                        page.get("extract") or ""
+                    )
 
-            except Exception:
-                pass
+                    translation["wikipedia_url"] = (
+                        page.get("content_urls", {})
+                        .get("desktop", {})
+                        .get("page", "")
+                    )
+
+        except Exception as e:
+            print(f"Enrichment error: {e}")
 
         return place
 
@@ -84,16 +91,27 @@ async def main():
 
     places = await import_city(city)
 
-    print(f"Imported {len(places)} places")
+    print(f"\nImported {len(places)} places\n")
 
     for place in places[:20]:
 
-        print(place.name)
+        translation = (
+            place.translations.get("en")
+            or next(iter(place.translations.values()), {})
+        )
 
-        print(place.category)
+        print("=" * 60)
+        print(translation.get("name", "Unknown"))
+        print(f"Category: {place.category}")
+        print(f"Coordinates: {place.latitude}, {place.longitude}")
 
-        print(place.image_url)
+        if place.image_url:
+            print(f"Image: {place.image_url}")
 
+        if translation.get("description"):
+            print(f"Description: {translation['description'][:150]}...")
+
+        print()
 
 if __name__ == "__main__":
     asyncio.run(main())
