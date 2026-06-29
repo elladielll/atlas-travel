@@ -1,0 +1,20 @@
+[
+  {
+    "id": "monastyrskyi_island",
+    "cityId": "dnipro",
+    "countryCode": "UA",
+    "category": "nature",
+    "aiScore": 9.6,
+    "image": "assets/images/places/monastyrskyi_island.jpg",
+    "name": {
+      "en": "Monastyrskyi Island",
+      "uk": "Монастирський острів",
+      "ru": "Монастырский остров"
+    },
+    "description": {
+      "en": "One of the most beautiful places in Dnipro for walking and sunsets.",
+      "uk": "Одне з найкрасивіших місць Дніпра для прогулянок та заходів сонця.",
+      "ru": "Одно из самых красивых мест Днепра для прогулок и закатов."
+    }
+  }
+]
