@@ -9,7 +9,7 @@ from app.api.map import router as map_router
 
 from app.api.imports import router as import_router
 
-app.include_router(import_router)
+
 
 app = FastAPI(
     title="Atlas API",
@@ -28,6 +28,7 @@ app.include_router(places_router)
 app.include_router(visits_router)
 app.include_router(companion_router)
 app.include_router(map_router)
+app.include_router(import_router)
 
 
 @app.get("/")

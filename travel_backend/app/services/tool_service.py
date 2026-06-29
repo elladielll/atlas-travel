@@ -1,10 +1,10 @@
-from app.repositories.places_repository import PlacesRepository
+from app.repositories.place_repository import PlaceRepository
 
 
 class ToolService:
 
     def __init__(self):
-        self.repository = PlacesRepository()
+        self.repository = PlaceRepository()
 
     async def execute(
         self,
