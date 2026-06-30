@@ -20,11 +20,13 @@ async def import_city(
     request: ImportCityRequest,
 ):
 
-    count = await import_service.import_city(
+    result = await import_service.import_city(
         request.city,
     )
 
     return ImportCityResponse(
-        success=True,
-        imported=count,
+        success=result["success"],
+        imported=result["imported"],
+        failed=result["failed"],
+        total=result["total"],
     )

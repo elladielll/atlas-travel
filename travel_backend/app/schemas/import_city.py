@@ -8,3 +8,5 @@ class ImportCityRequest(BaseModel):
 class ImportCityResponse(BaseModel):
     success: bool
     imported: int
+    failed: int
+    total: int
