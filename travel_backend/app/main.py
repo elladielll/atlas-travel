@@ -9,6 +9,13 @@ from app.api.map import router as map_router
 
 from app.api.imports import router as import_router
 
+from app.api.recommendations import router as recommendations_router
+
+from app.api.favorites import router as favorites_router
+
+from app.api.trips import router as trips_router
+
+from app.api.routes import router as routes_router
 
 
 app = FastAPI(
@@ -29,6 +36,12 @@ app.include_router(visits_router)
 app.include_router(companion_router)
 app.include_router(map_router)
 app.include_router(import_router)
+app.include_router(recommendations_router)
+app.include_router(
+    favorites_router,
+)
+app.include_router(trips_router)
+app.include_router(routes_router)
 
 
 @app.get("/")
